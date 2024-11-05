@@ -1,0 +1,68 @@
+    
+      /* Genel stil ayarları */
+      body {
+        background-color: #f8f9fa; /* Açık gri arka plan */
+        font-family: 'Arial', sans-serif; /* Daha modern bir yazı tipi */
+      }
+
+      h2 {
+        font-family: 'Georgia', serif; /* Başlık için serif yazı tipi */
+        color: #6F4C3E; /* Başlık rengi */
+      }
+
+      .product-card {
+        transition: transform 0.3s, box-shadow 0.3s; /* Gölgelendirme ve ölçeklendirme geçişleri */
+        border-radius: 15px; /* Yuvarlak köşeler */
+      }
+
+      .product-card:hover {
+        transform: scale(1.05); /* Kartların hover'da büyümesi */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Hover sırasında gölge ekleme */
+      }
+
+      .product-btn {
+        background-color: #6F4C3E;
+        color: white;
+        border-radius: 20px;
+        padding: 12px 25px; /* Düğme için biraz daha fazla boşluk */
+        font-size: 16px;
+        font-weight: bold;
+        border: none; /* Kenarlık kaldırıldı */
+        transition: background-color 0.3s, color 0.3s, transform 0.3s;
+      }
+
+      .product-btn:hover {
+        background-color: white;
+        color: #6F4C3E;
+        border: 1px solid #6F4C3E; /* Kenarlık ekleme */
+        cursor: pointer;
+        transform: scale(1.1);
+      }
+
+      /* Yalnızca yatay kaydırma */
+      .overflow-auto {
+        overflow-x: auto; /* Yatay kaydırma çubuğu */
+        white-space: nowrap; /* Kartların yan yana dizilmesi için */
+        padding: 10px 0; /* Üst ve alt boşluklar ekledik */
+      }
+
+      .overflow-auto::-webkit-scrollbar {
+        height: 10px; /* Kaydırma çubuğu yüksekliği */
+      }
+
+      .overflow-auto::-webkit-scrollbar-thumb {
+        background: #6F4C3E; /* Kaydırma çubuğu rengi */
+        border-radius: 10px; /* Köşe yuvarlama */
+      }
+
+      .overflow-auto::-webkit-scrollbar-track {
+        background: #e9ecef; /* Kaydırma çubuğu arka plan rengi */
+      }
+
+      /* Mobil görünümde yalnızca bir kart görünmesi için */
+      @media (max-width: 768px) {
+        .card {
+          flex: 0 0 80%; /* Kartların genişliğini ayarladık */
+          margin-right: 15px; /* Kartlar arası boşluk */
+        }
+      }

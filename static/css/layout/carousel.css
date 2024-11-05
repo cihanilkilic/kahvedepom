@@ -1,0 +1,46 @@
+.carousel-item {
+    height: 40vh; /* Slayt yüksekliği (tablet ve üstü için) */
+    background: #fff; /* Arka plan rengi */
+}
+
+.carousel-item img {
+    object-fit: cover;
+    height: 100%;
+    width: 100%;
+}
+
+.carousel-caption {
+    background: rgba(255, 255, 255, 0.7); /* Daha hafif arka plan */
+    border-radius: 5px; /* Kenarları yuvarlat */
+    padding: 10px; /* Daha az içerik boşluğu */
+    text-align: center; /* Metni ortala */
+    box-shadow: none; /* Gölgeli efekti kaldır */
+}
+
+.carousel-caption h5 {
+    font-size: 1.2rem; /* Daha küçük başlık yazı boyutu (mobil için) */
+    font-weight: bold; /* Kalın yazı */
+    color: #333; /* Başlık rengi */
+    margin-bottom: 5px; /* Altındaki açıklama ile arayı aç */
+}
+
+.carousel-caption p {
+    font-size: 0.9rem; /* Daha küçük açıklama yazı boyutu (mobil için) */
+    color: #555; /* Açıklama rengi */
+    margin: 0; /* Üst ve alt boşlukları kaldır */
+}
+
+/* Mobil cihazlar için stil ayarları */
+@media (max-width: 768px) {
+    .carousel-caption {
+        background: rgba(255, 255, 255, 0.5); /* Mobilde daha hafif arka plan */
+    }
+
+    .carousel-caption h5 {
+        font-size: 1.2rem; /* Başlık yazı boyutu */
+    }
+
+    .carousel-caption p {
+        font-size: 0.8rem; /* Açıklama yazı boyutu */
+    }
+}

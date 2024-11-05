@@ -1,0 +1,274 @@
+{% extends "base/layout.html" %}
+{% block content %}
+{% include 'base/offcanvas_menu.html' %}
+
+
+
+<style>
+    .order-card {
+        
+        border-radius: 15px;
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .order-card:hover {
+        transform: scale(1.02);
+        box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.15);
+    }
+    .order-img-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+        background-color: #f1f1f1;
+        border-radius: 12px;
+        margin: 15px;
+        box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .order-img {
+        max-width: 100%;
+        max-height: 180px;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+    .order-body {
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-top: 3px solid #6F4C3E;
+    }
+    .order-body h5 {
+        color: #6F4C3E;
+        font-weight: bold;
+    }
+    .order-summary, .order-customer, .order-price {
+        margin: 0.5rem 0;
+    }
+    .order-price {
+        font-size: 1.2rem;
+        color: dark;
+        font-weight: bold;
+    }
+</style>
+<div class="d-flex align-items-center mb-4 mt-5 container">
+    <h2 class="me-3">Sipariş Listesi</h2>
+    <hr class="flex-grow-1" style="margin: 0;">
+  </div>
+
+
+
+
+
+  <ul class="nav nav-pills  justify-content-center flex-row" id="pills-tab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"  data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Tümü</button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Devam Eden Siparişler</button>
+    </li>
+</ul>
+
+  <div class="tab-content" id="pills-tabContent">
+    <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab" tabindex="0">
+        
+
+        <div class="container mt-5 mb-5">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        
+                <!-- Sipariş Kartı Başlangıcı -->
+                <div class="col">
+                    <div class="card order-card h-100">
+                        <div class="order-img-wrapper">
+                            <img src="https://static.ticimax.cloud/cdn-cgi/image/width=370,quality=85/43439/uploads/urunresimleri/buyuk/seftali-surubu-700ml--4dce-.jpg" class="order-img" alt="Ürün Görseli">
+                        </div>
+                        <div class="card-body order-body">
+                            <h5 class="card-title">Sipariş Tarihi: 2023-10-15</h5>
+                            <p class="order-summary"><strong>Sipariş Özeti:</strong> 5 kg Elma, 2 kg Muz</p>
+                            <p class="order-customer"><strong>Alıcı:</strong> Ali Veli</p>
+                            <p class="order-price">Tutar:175₺</p>
+
+                        </div>
+                        <div class="card-footer text-center">
+                            <small class="text-success ">1 ürün 26 Kasım tarihinde teslim edilmiştir.</small>
+                          </div>
+                    </div>
+                </div>
+                <!-- Sipariş Kartı Bitişi -->
+        
+                <div class="col">
+                    <div class="card order-card h-100">
+                        <div class="order-img-wrapper">
+                            <img src="https://static.ticimax.cloud/cdn-cgi/image/width=370,quality=85/43439/uploads/urunresimleri/buyuk/yesil-elma-surubu-700-ml-92-02b.jpg" class="order-img" alt="Ürün Görseli">
+                        </div>
+                        <div class="card-body order-body">
+                            <h5 class="card-title">Sipariş Tarihi: 2023-10-18</h5>
+                            <p class="order-summary"><strong>Sipariş Özeti:</strong> 3 kg Portakal, 1 kg Çilek</p>
+                            <p class="order-customer"><strong>Alıcı:</strong> Ayşe Fatma</p>
+                            <p class="order-price">Tutar:175₺</p>
+
+                        </div>
+                        <div class="card-footer text-center">
+                            <small class="text-success ">1 ürün 26 Kasım tarihinde teslim edilmiştir.</small>
+                          </div>
+                    </div>
+                </div>
+        
+                <div class="col">
+                    <div class="card order-card h-100">
+                        <div class="order-img-wrapper">
+                            <img src="https://static.ticimax.cloud/cdn-cgi/image/width=370,quality=85/43439/uploads/urunresimleri/buyuk/muz-surubu-700-ml--9567-.jpg" class="order-img" alt="Ürün Görseli">
+                        </div>
+                        <div class="card-body order-body">
+                            <h5 class="card-title">Sipariş Tarihi: 2023-10-20</h5>
+                            <p class="order-summary"><strong>Sipariş Özeti:</strong> 2 kg Üzüm, 3 kg Şeftali</p>
+                            <p class="order-customer"><strong>Alıcı:</strong> Mehmet Aslan</p>
+                            <p class="order-price">Tutar:175₺</p>
+
+                        </div>
+                        <div class="card-footer text-center">
+                            <small class="text-success ">1 ürün 26 Kasım tarihinde teslim edilmiştir.</small>
+                          </div>
+                    </div>
+                </div>
+        
+                <!-- Sipariş Kartı Başlangıcı -->
+                <div class="col">
+                    <div class="card order-card h-100">
+                        <div class="order-img-wrapper">
+                            <img src="https://static.ticimax.cloud/cdn-cgi/image/width=370,quality=85/43439/uploads/urunresimleri/buyuk/seftali-surubu-700ml--4dce-.jpg" class="order-img" alt="Ürün Görseli">
+                        </div>
+                        <div class="card-body order-body">
+                            <h5 class="card-title">Sipariş Tarihi: 2023-10-15</h5>
+                            <p class="order-summary"><strong>Sipariş Özeti:</strong> 5 kg Elma, 2 kg Muz</p>
+                            <p class="order-customer"><strong>Alıcı:</strong> Ali Veli</p>
+                            <p class="order-price">Tutar:175₺</p>
+
+                        </div>
+                        <div class="card-footer text-center">
+                            <small class="text-success ">1 ürün 26 Kasım tarihinde teslim edilmiştir.</small>
+                          </div>
+                    </div>
+                </div>
+                <!-- Sipariş Kartı Bitişi -->
+                <!-- Sipariş Kartı Başlangıcı -->
+                <div class="col">
+                    <div class="card order-card h-100">
+                        <div class="order-img-wrapper">
+                            <img src="https://static.ticimax.cloud/cdn-cgi/image/width=370,quality=85/43439/uploads/urunresimleri/buyuk/seftali-surubu-700ml--4dce-.jpg" class="order-img" alt="Ürün Görseli">
+                        </div>
+                        <div class="card-body order-body">
+                            <h5 class="card-title">Sipariş Tarihi: 2023-10-15</h5>
+                            <p class="order-summary"><strong>Sipariş Özeti:</strong> 5 kg Elma, 2 kg Muz</p>
+                            <p class="order-customer"><strong>Alıcı:</strong> Ali Veli</p>
+                            <p class="order-price">Tutar:175₺</p>
+
+                        </div>
+                        <div class="card-footer text-center">
+                            <small class="text-success ">1 ürün 26 Kasım tarihinde teslim edilmiştir.</small>
+                          </div>
+                    </div>
+                </div>
+                <!-- Sipariş Kartı Bitişi -->
+            </div>
+        </div>
+        
+        
+
+
+
+    </div>
+    <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab" tabindex="0">
+        
+
+
+
+
+
+        <div class="container mt-5 mb-5">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        
+                <!-- Sipariş Kartı Başlangıcı -->
+                <div class="col">
+                    <div class="card order-card h-100">
+                        <div class="order-img-wrapper">
+                            <img src="https://static.ticimax.cloud/cdn-cgi/image/width=370,quality=85/43439/uploads/urunresimleri/buyuk/seftali-surubu-700ml--4dce-.jpg" class="order-img" alt="Ürün Görseli">
+                        </div>
+                        <div class="card-body order-body">
+                            <h5 class="card-title">Sipariş Tarihi: 2023-10-15</h5>
+                            <p class="order-summary"><strong>Sipariş Özeti:</strong> 5 kg Elma, 2 kg Muz</p>
+                            <p class="order-customer"><strong>Alıcı:</strong> Ali Veli</p>
+                            <p class="order-price">Tutar:175₺</p>
+
+                        </div>
+                        <div class="card-footer text-center">
+                            <small class="text-danger ">Spariş devam ediyor...</small>
+                          </div>
+                    </div>
+                </div>
+                <!-- Sipariş Kartı Bitişi -->
+        
+                <div class="col">
+                    <div class="card order-card h-100">
+                        <div class="order-img-wrapper">
+                            <img src="https://static.ticimax.cloud/cdn-cgi/image/width=370,quality=85/43439/uploads/urunresimleri/buyuk/yesil-elma-surubu-700-ml-92-02b.jpg" class="order-img" alt="Ürün Görseli">
+                        </div>
+                        <div class="card-body order-body">
+                            <h5 class="card-title">Sipariş Tarihi: 2023-10-18</h5>
+                            <p class="order-summary"><strong>Sipariş Özeti:</strong> 3 kg Portakal, 1 kg Çilek</p>
+                            <p class="order-customer"><strong>Alıcı:</strong> Ayşe Fatma</p>
+                            <p class="order-price">Tutar:175₺</p>
+                            
+                        </div>
+                        <div class="card-footer text-center">
+                            <small class="text-danger ">Spariş devam ediyor...</small>
+                          </div>
+                    </div>
+                </div>
+        
+                <div class="col">
+                    <div class="card order-card h-100">
+                        <div class="order-img-wrapper">
+                            <img src="https://static.ticimax.cloud/cdn-cgi/image/width=370,quality=85/43439/uploads/urunresimleri/buyuk/muz-surubu-700-ml--9567-.jpg" class="order-img" alt="Ürün Görseli">
+                        </div>
+                        <div class="card-body order-body">
+                            <h5 class="card-title">Sipariş Tarihi: 2023-10-20</h5>
+                            <p class="order-summary"><strong>Sipariş Özeti:</strong> 2 kg Üzüm, 3 kg Şeftali</p>
+                            <p class="order-customer"><strong>Alıcı:</strong> Mehmet Aslan</p>
+                            <p class="order-price">Tutar:175₺</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <small class="text-danger ">Spariş devam ediyor...</small>
+                          </div>
+                    </div>
+                </div>
+        
+     
+
+            </div>
+        </div>
+        
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+
+
+
+
+
+{% endblock %}
+{% include 'base/footer.html' %}

@@ -1,0 +1,102 @@
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5 w-100 text-center" id="exampleModalLabel">Adres Ekle</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form method="post" action="{% url 'user:address_create' %}">
+          {% csrf_token %}
+          <!-- Ad-Soyad -->
+          <div class="row g-3 container">
+            <div class="col-md-6 form-floating mb-3 mt-3">
+              <input type="text" class="form-control" id="name" placeholder="Ad" name="first_name">
+              <label for="name">Ad</label>
+              {% if form.first_name.errors %}
+                <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-md-6 form-floating mt-3 mb-3">
+              <input type="text" class="form-control" id="lastname" placeholder="soyad" name="last_name">
+              <label for="lastname">Soyad</label>
+              {% if form.last_name.errors %}
+                <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <!-- Ad-Soyad -->
+          
+          <!-- Telefon-İl -->
+          <div class="row g-3 container">
+            <div class="col-md-6 form-floating mb-3 mt-3">
+              <input type="number" class="form-control" id="phone" placeholder="Telefon" name="phone">
+              <label for="phone">Telefon</label>
+              {% if form.phone.errors %}
+                <div class="text-danger small">{{ form.phone.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-md-6 form-floating mt-3 mb-3">
+              <input type="text" class="form-control" id="city" placeholder="İl" name="city">
+              <label for="city">İl</label>
+              {% if form.city.errors %}
+                <div class="text-danger small">{{ form.city.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <!-- Telefon-İl -->
+
+          <!-- İlçe-Mahalle  -->
+          <div class="row g-3 container">
+            <div class="col-md-6 form-floating mb-3 mt-3">
+              <input type="text" class="form-control" id="district" placeholder="Telefon" name="district">
+              <label for="district">İlçe</label>
+              {% if form.district.errors %}
+                <div class="text-danger small">{{ form.district.errors.0 }}</div>
+              {% endif %}
+            </div>
+            <div class="col-md-6 form-floating mt-3 mb-3">
+              <input type="text" class="form-control" id="mahalle" placeholder="mahalle" name="mahalle">
+              <label for="mahalle">Mahalle</label>
+              {% if form.mahalle.errors %}
+                <div class="text-danger small">{{ form.mahalle.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <!-- İlçe-Mahalle  -->
+
+          <!-- Adres -->
+          <div class="row g-3 container">
+            <div class="col-md-12 form-floating mb-3 mt-3">
+              <textarea type="text" class="form-control" id="adres" placeholder="Adres" name="address" style="height: 100px"></textarea>
+              <label for="adres">Adres</label>
+              <div id="emailHelp" class="form-text">Kargonuzun size sorunsuz bir şekilde ulaşabilmesi için mahalle, cadde, sokak, bina gibi detay bilgileri eksiksiz girdiğinizden emin olun.</div>
+              {% if form.address.errors %}
+                <div class="text-danger small">{{ form.address.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+          <!-- Adres -->
+
+          <!-- Adres Başlığı  -->
+          <div class="row g-3 container">
+            <div class="col-md-12 form-floating mb-3 mt-3">
+              <input type="text" class="form-control" id="adrestitle"  placeholder="Adres Başlığını Giriniz" name="address_title">
+              <label for="adrestitle">Adres Başlığı</label>
+              {% if form.address_title.errors %}
+                <div class="text-danger small">{{ form.address_title.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        <!-- Adres Başlığı  -->
+
+        <div class="modal-footer justify-content-lg-around">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Kapat</button>
+          <button type="submit" class="btn btn-success">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

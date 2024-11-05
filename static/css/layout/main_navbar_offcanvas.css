@@ -1,0 +1,152 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.text-coffee {
+    color: #6F4C3E;
+}
+
+.btn-coffee {
+    background-color: #6F4C3E;
+    color: white;
+    transition: background-color 0.3s ease;
+}
+
+.btn-coffee:hover {
+    background-color: #5A3A2E;
+}
+
+.link-coffee-hover {
+    color: #6C757D;
+    transition: color 0.3s ease;
+}
+
+.link-coffee-hover:hover {
+    color: #6F4C3E;
+}
+
+.navbar-toggler {
+    border: none;
+}
+.offcanvas {
+    background-color: #f4f4f4; /* Offcanvas arka plan rengi */
+    color: #333; /* Metin rengi */
+}
+
+.offcanvas-header {
+    background-color: #f8f9fa;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 8px rgba(111, 76, 62, 0.4);
+}
+
+.input-group {
+    max-width: 500px; /* Arama çubuğu için daha geniş bir alan */
+}
+
+/* Mobil görünüm için daha iyi bir düzenleme */
+@media (max-width: 576px) {
+    .input-group {
+        width: 100%;
+    }
+
+    .navbar .btn-link {
+        margin: 0 5px;
+    }
+
+    .offcanvas-body ul {
+        padding: 0;
+    }
+
+    .offcanvas-body li {
+        margin: 10px 0;
+    }
+}
+
+/* Genel stil ayarları */
+.navbar {
+    background-color: #fff; /* Daha net bir görünüm için beyaz arka plan */
+    border-bottom: 1px solid #eaeaea; /* İnce bir alt sınır */
+    transition: background-color 0.3s ease; /* Hover durumunda geçiş efekti */
+}
+
+.navbar:hover {
+    background-color: #f8f9fa; /* Hover durumunda açık gri arka plan */
+}
+
+.btn-link {
+    font-size: 1.25rem; /* İkon boyutunu artır */
+    margin: 0 10px; /* Butonlar arasında daha fazla boşluk */
+}
+.accordion-button {
+    background-color: #f8f9fa; /* Başlangıç arka plan rengi */
+    color: #6F4C3E; /* Metin rengi */
+    transition: background-color 0.3s ease;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #6F4C3E; /* Açık durumda arka plan rengi */
+    color: white; /* Açık durumda metin rengi */
+}
+
+.accordion-button:hover {
+    background-color: rgba(111, 76, 62, 0.2); /* Hover durumunda arka plan rengi */
+}
+.accordion-body {
+    padding: 1rem; /* Daha fazla boşluk ekleyerek estetiği artır */
+}
+
+.accordion-body ul {
+    padding-left: 1.5rem; /* Liste içindeki elemanlar için sol boşluk */
+}
+
+.accordion-body li {
+    margin-bottom: 0.5rem; /* Her liste öğesi arasında boşluk */
+}
+
+.accordion-body li a {
+    font-weight: 500; /* Metin kalınlığını artırarak vurgulamak */
+    transition: color 0.3s ease, transform 0.3s ease; /* Hover animasyonu */
+}
+
+.accordion-body li a:hover {
+    color: #6F4C3E; /* Hover durumunda metin rengi */
+    transform: translateY(-2px); /* Hover durumunda yukarı kaydır */
+}
+.coffee-list {
+    padding: 0; /* Varsayılan padding kaldırıldı */
+    margin: 0; /* Varsayılan margin kaldırıldı */
+}
+
+.coffee-list li {
+    margin: 15px 0; /* Öğeler arasında daha fazla boşluk */
+    border-bottom: 1px solid #eaeaea; /* İnce alt sınır */
+    padding: 10px 0; /* Yükseklik artırıldı */
+    transition: background-color 0.3s ease; /* Arka plan rengi geçişi */
+}
+
+.coffee-list li:hover {
+    background-color: rgba(111, 76, 62, 0.1); /* Hover durumunda arka plan rengi */
+}
+
+.link-coffee-hover {
+    color: #6F4C3E; /* Metin rengi */
+    font-weight: 500; /* Yazı kalınlığı */
+    text-decoration: none; /* Altı çizgiyi kaldır */
+    font-size: 1.1rem; /* Yazı boyutu */
+}
+
+.link-coffee-hover:hover {
+    color: #5A3A2E; /* Hover durumunda daha koyu bir renk */
+}
+
+/* SEPET İCONU */
+.bi-cart2 {
+    transition: transform 0.3s ease, color 0.3s ease; /* Geçiş efekti ekliyoruz */
+}
+
+.bi-cart2:hover {
+    transform: scale(1.1); /* Hover sırasında simgeyi büyüt */
+   /* color: #ffcc00;  Hover sırasında simgenin rengini değiştir */
+}
