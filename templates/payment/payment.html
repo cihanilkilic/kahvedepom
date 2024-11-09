@@ -1,0 +1,564 @@
+{% load static %}
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>☕ Kahve Depom</title>
+    <link rel="stylesheet" href="{% static 'css/layout/footer.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  </head>
+  <body >
+    <nav class="navbar bg-white shadow-sm sticky-top py-3">
+      <div class="container">
+        <a class="navbar-brand fw-bold text-coffee" style="color: #6F4C3E" href="{% url 'main_home:index'%}">☕ Kahve Depom</a>
+      </div>
+    </nav>
+    <style>
+      #backToTopBtn {
+        display: none; /* İlk başta gizli */
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 99;
+    }
+        .btn-coffee {
+            background-color: #6F4C3E;
+            color: white;
+            border-radius: 20px;
+            padding: 12px 25px; /* Düğme için biraz daha fazla boşluk */
+            font-size: 16px;
+            font-weight: bold;
+            border: none; /* Kenarlık kaldırıldı */
+            transition: background-color 0.3s, color 0.3s, transform 0.3s;
+        }
+        .btn-coffee:hover {
+            background-color: white;
+            color: #6F4C3E;
+            border: 1px solid #6F4C3E; /* Kenarlık ekleme */
+            cursor: pointer;
+            transform: scale(1.1);
+        }
+        #addressList {
+
+          overflow: hidden;  /* Taşan içeriği gizler */
+          text-overflow: ellipsis; /* Taşan metin için üç nokta ekler */
+          white-space: nowrap; /* Tek satırda görünmesini sağlar */
+      }
+      
+
+      @media (max-width: 576px) {
+          #addressList {
+              max-width: 100%; /* Küçük ekranlarda tam genişlik */
+          }
+          .dropdown-item {
+              font-size: 1rem; /* Küçük ekranlarda yazı boyutunu küçült */
+          }
+      }
+      
+    </style>
+
+    
+    <ul class="nav nav-pills mb-3 justify-content-center flex-row mt-5 " id="pills-tab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill" data-bs-target="#pills-home" type="button" role="tab" aria-controls="pills-home" aria-selected="true">Adres Bilgileri</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-profile-tab" data-bs-toggle="pill" data-bs-target="#pills-profile" type="button" role="tab" aria-controls="pills-profile" aria-selected="false">Ödeme Seçenekleri</button>
+      </li>
+
+    </ul>
+    <div class="tab-content" id="pills-tabContent">
+      <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab" tabindex="0">
+     
+  <!-- adres bilgilgileri balangıç-->
+  <div class="col-md-12  container mb-5">
+    <div class="card">
+      <div class="card-body">
+       <!--  <h5 class="card-title">Special title treatment</h5> -->
+      <div class="form-check">
+        <h5 class="card-title">Teslimat Adresi</h5>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-6 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-grid">
+                <div class="dropdown w-100" id="addressDropdown">
+                  <button class="btn btn-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Teslimat Adresi Seç 
+                  </button>
+                  <ul class="dropdown-menu text-center" id="addressList">
+                      <!-- Adresler buraya eklenecek -->
+                  </ul>
+              </div>
+              
+              </div>
+
+                  <div class="card-body" id="selectedAddress">
+                      <div class="form-check">
+                          <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault" checked>
+                          <label class="form-check-label" for="flexRadioDefault">
+                              Teslimat adresi (seçilidir)
+                          </label>
+                      </div>
+                      <div class="card-body">
+                          <ul class="list-group list-group-flush" id="addressDetails">
+                              <li class="list-group-item">Adı Soyadı: <span id="fullName">Seçili adres yok</span></li>
+                              <li class="list-group-item">Şehir: <span id="city">Seçili adres yok</span></li>
+                              <li class="list-group-item">İlçe: <span id="district">Seçili adres yok</span></li>
+                              <li class="list-group-item">Mahalle: <span id="mahalle">Seçili adres yok</span></li>
+                              <li class="list-group-item">Açık Adres: <span id="openAddress">Seçili adres yok</span></li>
+                          </ul>
+                      </div>
+
+                      <div class="card-body">
+                        <div class="d-grid">
+                          <button type="button" class="btn btn-success h-100" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">Adres Ekle</button>
+                          <!-- POPUP BAŞLANGIÇ -->
+                          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-scrollable">
+                              <div class="modal-content">
+                                <div class="modal-header">
+          
+                                  <!--   <h5 class="modal-title" id="exampleModalLabel ">Adres Ekle</h5>-->
+                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                  <form>
+                                    <div class="row col-md-12">
+                                      <div class="mb-3 col-md-6">
+                                        <label for="recipient-name" class="col-form-label">Ad</label>
+                                        <input type="text" class="form-control" id="recipient-name">
+                                      </div>
+                                      <div class="mb-3 col-md-6">
+                                        <label for="recipient-name" class="col-form-label">Soyad</label>
+                                        <input type="text" class="form-control" id="recipient-name">
+                                      </div>
+                                      <div class="mb-3 col-md-6">
+                                        <label for="recipient-name" class="col-form-label">Telefon</label>
+                                        <input type="text" class="form-control" id="recipient-name">
+                                      </div>
+                                      <div class="mb-3 col-md-6">
+                                        <label for="recipient-name" class="col-form-label">İl</label>
+                                        <input type="text" class="form-control" id="recipient-name">
+                                      </div>
+                                      <div class="mb-3 col-md-6">
+                                        <label for="recipient-name" class="col-form-label">İlçe</label>
+                                        <input type="text" class="form-control" id="recipient-name">
+                                      </div>
+                                      <div class="mb-3 col-md-6">
+                                        <label for="recipient-name" class="col-form-label">Mahalle</label>
+                                        <input type="text" class="form-control" id="recipient-name">
+                                      </div>
+                                      <div class="mb-3">
+                                        <label for="message-text" class="col-form-label">Adres</label>
+                                        <textarea class="form-control" id="message-text"></textarea>
+                                      </div>
+                                      <div class="mb-3 col-md-12">
+                                        <label for="recipient-name" class="col-form-label">Adres Başlığı</label>
+                                        <input type="text" class="form-control" id="recipient-name">
+                                      </div>
+                                    </div>
+                                  </form>
+                                </div>
+                                <div class="modal-footer">
+                                  <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Vazgeç</button>
+                                  <button type="button" class="btn btn-primary">Kaydet</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- POPUP BİTİŞ -->
+                        </div>
+          
+        
+                      </div>
+
+
+            </div>
+          </div>
+        </div>
+
+        
+        </div>
+        <div class="col-sm-6 mb-3 mb-sm-0">
+          <div class="card">
+
+            <div class="card-body">
+              
+              <span id="cart-info">Sepetimdeki Ürünler (<span id="cart-count">0</span>)</span>
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault" checked>
+                    <label class="form-check-label" for="flexCheckDefault">
+                      <p class="card-text ">  Ön Bilgilendirme Koşulları'nı ve Mesafeli Satış Sözleşmesi'ni okudum, onaylıyorum.</p>
+                    </label>
+                  </div>
+                  <hr>
+                  <table class="table table-hover">
+
+                    <tbody>
+                      <tr>
+                        <th scope="row">Ürünün Toplamı</th>
+                        <td class="total_amount"></td>
+          
+          
+                      </tr>
+                      <tr>
+                        <th scope="row">Kargo Toplam</th>
+                        <td>15,99 TL</td>
+          
+          
+                      </tr>
+                      <tr>
+                        <th scope="row">Toplam</th>
+                        <td colspan="2">15,99 TL</td>
+          
+                      </tr>
+                    </tbody>
+                  </table>
+          
+                  <div class="d-grid">
+                    <a href="#" class="btn btn-warning h-100 text-white" aria-current="page" data-bs-toggle="modal" data-bs-target="#showorderbtn" >Ürünleri Göster</a>
+                  </div>
+                </div>
+      
+
+          </div>
+        </div>
+
+      </div>
+
+{% comment %} 
+      <a href="#" class="btn btn-primary d-block">Ödeme Yap</a> {% endcomment %}
+
+    </div>
+
+  </div>
+      <!--  adres bilgilgileri bitiş-->
+  </div>
+
+
+      </div>
+      <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab" tabindex="0">
+
+        <!-- Adres Bilgileri Başlangıç -->
+        <div class="container mb-5">
+          <div class="card">
+            <div class="card-body">
+      
+              <h5 class="card-title">Kart Bilgileri</h5>
+      
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <div class="card">
+                    <div class="card-body">
+                      <label for="card-number" class="col-form-label">Kart Numarası</label>
+                      <input type="text" class="form-control" id="card-number">
+      
+                      <label for="expiry-date" class="col-form-label mt-3">Son Kullanma Tarihi</label>
+                      <div class="row">
+                        <!-- Kredi Ay Kısmı -->
+                        <div class="col-6 col-md-4 mt-2">
+                          <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                              Ay
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-dark"  aria-labelledby="dropdownMenuButton2" style="min-width: 80px;">
+                              <li><a class="dropdown-item" href="#">01</a></li>
+                              <li><a class="dropdown-item" href="#">02</a></li>
+                              <li><a class="dropdown-item" href="#">03</a></li>
+                              <li><a class="dropdown-item" href="#">04</a></li>
+                              <li><a class="dropdown-item" href="#">05</a></li>
+                              <li><a class="dropdown-item" href="#">06</a></li>
+                              <li><a class="dropdown-item" href="#">07</a></li>
+                              <li><a class="dropdown-item" href="#">08</a></li>
+                              <li><a class="dropdown-item" href="#">09</a></li>
+                              <li><a class="dropdown-item" href="#">10</a></li>
+                              <li><a class="dropdown-item" href="#">11</a></li>
+                              <li><a class="dropdown-item" href="#">12</a></li>
+        
+                            </ul>
+                          </div>
+                        </div>
+      
+                        <!-- Kredi Yıl Kısmı -->
+                        <div class="col-6 col-md-4 mt-2">
+                          <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                              Yıl
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-dark"  aria-labelledby="dropdownMenuButton2" style="min-width: 80px;">
+                              <li><a class="dropdown-item" href="#">2022</a></li>
+                              <li><a class="dropdown-item" href="#">2023</a></li>
+                              <li><a class="dropdown-item" href="#">2024</a></li>
+                              <li><a class="dropdown-item" href="#">2025</a></li>
+                              <li><a class="dropdown-item" href="#">2026</a></li>
+                              <li><a class="dropdown-item" href="#">2027</a></li>
+                              <li><a class="dropdown-item" href="#">2028</a></li>
+                              <li><a class="dropdown-item" href="#">2029</a></li>
+                              <li><a class="dropdown-item" href="#">2030</a></li>
+                              <li><a class="dropdown-item" href="#">2031</a></li>
+                              <li><a class="dropdown-item" href="#">2032</a></li>
+                              <li><a class="dropdown-item" href="#">2033</a></li>
+                            </ul>
+                          </div>
+                        </div>
+      
+                        <!-- CVV -->
+                        <div class="col-md-4 mt-2">
+                          <input type="text" placeholder="CVV" class="form-control" id="cvv">
+                        </div>
+                      </div>
+      
+                      <!-- 3D Secure Checkbox -->
+                      <div class="form-check mt-3">
+                        <input class="form-check-input" type="checkbox" id="flexCheckSecure">
+                        <label class="form-check-label" for="flexCheckSecure">
+                          3D Secure ile ödemek istiyorum.
+                        </label>
+                      </div>
+                      <div class="d-grid"><a href="" class="btn btn-primary w-100">Ödemeyi Gerçekleştir</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+      
+                <div class="col-md-6 mb-3">
+                  <div class="card">
+                    <div class="card-body">
+                      <h5 class="card-title">Taksit Seçenekleri</h5>
+                      <h6 class="small">Ödemeniz Tek Çekim Üzerinden Yapılacaktır.</h6>
+      
+                      <table class="table table-striped">
+                        <thead>
+                          <tr>
+                            <th scope="col">Taksit Sayısı</th>
+                            <th scope="col">Net Ödeme</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <th scope="row">Tek Çekim</th>
+                            <td class="total_amount">0</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+      
+            </div>
+          </div>
+        </div>
+      </div>
+      
+        <!-- sepetteki ürünlerin gössterilmesi Modal -->
+        <div class="modal fade" id="showorderbtn" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5 w-100 text-center" id="exampleModalLabel">Sepet İçeriği</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+                  <div class="modal-body">
+                      <ul id="cart-items-list" class="list-group">
+                          <!-- Sepet öğeleri buraya eklenecek -->
+                      </ul>
+                      <div class="mt-3 justify-content-center align-items-center">
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ürünlerin Toplam Tutarı: <strong class=" total_amount"></strong> <!--TL -->
+                      </div>
+                  </div>
+                  <div class="modal-footer p-0">
+                    <button type="button" class="btn btn-danger w-100" data-bs-dismiss="modal">Kapat</button>
+                </div>
+                
+              </div>
+          </div>
+      </div>
+        <!-- sepetteki ürünlerin gössterilmesi Modal -->
+<!-- backToTopBtn -->
+<button id="backToTopBtn" class="btn btn-light boder boder-1">
+  <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-chevron-double-up" viewBox="0 0 16 16">
+      <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z"/>
+      <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+    </svg>
+</button>
+<!-- backToTopBtn -->
+ 
+    <script>
+    // Sayfa kaydırıldığında düğmenin görünürlüğünü kontrol et
+    window.onscroll = function() { scrollFunction(); };
+
+    function scrollFunction() {
+        if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+            document.getElementById("backToTopBtn").style.display = "block";
+        } else {
+            document.getElementById("backToTopBtn").style.display = "none";
+        }
+    }
+
+    // Düğmeye tıklandığında sayfayı en üste kaydır
+    document.getElementById("backToTopBtn").onclick = function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+</script>
+    <script>
+
+      function updateCartCount() {
+        $.ajax({
+            url: "{% url 'basket:get_cart_count' %}",
+            method: "GET",
+            success: function(data) {
+                $('#cart-count').text(data.cart_count); // Sepet sayısını güncelle
+            },
+            error: function(error) {
+                console.log("Error:", error);
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        // Sayfa yüklendiğinde sepet sayısını al
+        updateCartCount();
+
+        // Sepete ürün eklendiğinde bu fonksiyonu çağırın
+        $('.add-to-cart').on('click', function() {
+            // Sepete ürün ekleme işlemleri burada yapılmalı.
+            // Ürün sepete eklendiğinde sepet sayısını güncelle
+            updateCartCount();
+        });
+    });
+    
+    $(document).ready(function() {
+      // Toplam tutarı güncelleyen fonksiyon
+      function updateTotalAmount(totalAmount) {
+          $('.total_amount').text(totalAmount); // Toplam tutarı güncelle
+      }
+  
+      // Sepet öğelerini yükle
+      function loadCartItems() {
+          $.ajax({
+              url: '{% url "payment_process:payment_view" %}',  // URL'yi doğru kullanın
+              type: 'GET',
+              dataType: 'json',
+              success: function(data) {
+                  if (data.items) {
+                      $('#cart-items-list').empty(); // Mevcut öğeleri temizle
+                      $.each(data.items, function(index, item) {
+                          $('#cart-items-list').append(
+                              '<li class="list-group-item d-flex justify-align-content-between align-items-center">' +
+                              '<img src="' + item.product_image + '" alt="' + item.product_name + '" style="width:50px;height:50px;" class="me-2">' +
+                              '<div>' +
+                                  item.product_name + '<br>' +
+                                  'Miktar: ' + item.quantity + '<br>' +
+                                  '<strong>Toplam: ' + item.total_price + ' ₺</strong>' +
+                              '</div>' +
+                              '</li>'
+                          );
+                      });
+                      updateTotalAmount(data.total_amount + ' ₺'); // Toplam tutarı güncelle fonksiyonunu çağır
+                  }
+              },
+              error: function(xhr) {
+                  alert('Bir hata oluştu: ' + xhr.responseJSON.error);
+              }
+          });
+      }
+  
+      // Kullanıcı adres bilgilerini yükle
+// Kullanıcı adres bilgilerini yükle
+function loadUserAddresses() {
+  $.ajax({
+      url: '{% url "payment_process:payment_view" %}',  // URL'yi doğru kullanın
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
+          if (data.addresses && data.addresses.length > 0) {
+              $('#addressList').empty(); // Mevcut adresleri temizle
+              var firstAddress = null;
+
+              $.each(data.addresses, function(index, address) {
+                  $('#addressList').append(
+                      '<li class="list-group-item"> <a class="dropdown-item address-item" ' +
+                      'data-full-name="' + address.first_name + ' ' + address.last_name + 
+                      '" data-city="' + address.city + '">' + 
+                      address.address_title + ': ' + address.first_name + ' ' + address.last_name + 
+                      ' - ' + address.city + ' - ' + address.district + 
+                      '</a></li>'
+                  );
+
+                  // İlk adresi sakla
+                  if (index === 0) {
+                      firstAddress = address;
+                  }
+              });
+
+              // İlk adres varsa, onu kartta göster
+              if (firstAddress) {
+                  $('#fullName').text(firstAddress.first_name + ' ' + firstAddress.last_name);
+                  $('#city').text(firstAddress.city);
+                  $('#district').text(firstAddress.district);
+                  $('#mahalle').text(firstAddress.mahalle);
+                  $('#openAddress').text(firstAddress.address);
+              } else {
+                  $('#fullName').text('Seçili adres yok');
+                  $('#city').text('Seçili adres yok');
+                  $('#district').text('Seçili adres yok');
+                  $('#mahalle').text('Seçili adres yok');
+                  $('#openAddress').text('Seçili adres yok');
+              }
+          } else {
+              $('#addressList').empty(); // Mevcut adresleri temizle
+              $('#addressList').append('<li class="list-group-item">Seçili adres yok</li>'); // Seçili adres yok mesajı ekle
+          }
+      },
+      error: function(xhr) {
+          console.error('Adres bilgileri alınırken bir hata oluştu:', xhr);
+      }
+  });
+}
+
+  
+      // Seçilen adres bilgilerini göster
+      $(document).on('click', '.address-item', function() {
+          var fullName = $(this).data('full-name');
+          var city = $(this).data('city');
+          var district = $(this).data('district');
+          var mahalle = $(this).data('mahalle');
+          var openAddress = $(this).data('open-address');
+  
+          // Bilgileri kart içinde güncelle
+          $('#fullName').text(fullName);
+          $('#city').text(city);
+          $('#district').text(district);
+          $('#mahalle').text(mahalle);
+          $('#openAddress').text(openAddress);
+      });
+  
+      // Sayfa yüklendiğinde toplam tutarı ve sepet öğelerini yükle
+      loadCartItems();
+      loadUserAddresses(); // Adres bilgilerini yükle
+  
+      // Modal açıldığında sepet öğelerini tekrar yükle
+      $('#showorderbtn').on('show.bs.modal', function() {
+          loadCartItems();
+          loadUserAddresses(); // Adres bilgilerini tekrar yükle
+      });
+  });
+  
+    </script>
+    
+
+    
+    {% include 'base/footer.html' %}
+    <!-- Bootstrap JS Bağlantısı -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

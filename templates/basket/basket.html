@@ -1,0 +1,401 @@
+{% extends "base/layout.html" %}
+{% block content %}
+{% include 'base/offcanvas_menu.html' %}
+
+<div class="container mb-5">
+    <div class="header d-flex align-items-center mb-4 mt-5">
+        <h2 class="me-3 text-coffee">Alışveriş Sepeti</h2>
+        <hr class="flex-grow-1" style="margin: 0;">
+    </div>
+
+    <div id="cart-container">
+    <!-- Sepet ürünleri buraya yüklenecek -->
+
+    <!-- Sepet Boş Mesajı -->
+    <div id="empty-cart-message" class="cart-item d-flex align-items-center justify-content-center mb-5 mt-5 text-danger">
+        
+        <p class="text-center">Sepetinde ürün bulunamadı. “Alışverişe Başla” butonuna tıklayarak dilediğiniz ürünleri sepete ekleyebilirsiniz.<br><a href="{% url "main_home:index" %}" type="button" class="btn btn-outline product-btn">Alışverişe Başla</a></p>
+    </div>
+    <!-- Sepet Boş Mesajı -->
+    </div>
+
+    <!-- Toplam Bölümü -->
+    <div id="total-section" class="total-section shadow-lg p-3 mb-5 bg-body-tertiary rounded-bottom  d-flex justify-content-between d-none">
+        <p class="mt-2 total">Toplam: <span id="total-price">0 ₺</span></p>
+
+        
+       {% comment %} <a href="{% url "payment_process:payment_view" %}" class="link-underline-primary"></a> {% endcomment %}
+         <button type="submit" id="checkout-button" class="btn btn-checkout bg-success text-white">Alışverişi Tamamla</button>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Sepet verilerini al
+        $.ajax({
+            url: '{% url "basket:cart_items" %}',  // Django URL adı
+            method: 'GET',
+            success: function(response) {
+                var items = response.items;
+                var totalAmount = 0;
+    
+                if (items.length > 0) {
+                    $('#empty-cart-message').addClass('d-none'); // Boş sepet mesajını gizle
+                    $('#total-section').removeClass('d-none');   // Toplam bölümünü göster
+    
+                    items.forEach(function(item) {
+                        totalAmount += parseFloat(item.total_amount);
+    
+                        $('#cart-container').append(`
+                            <div class="cart-item d-flex align-items-center justify-content-between mb-3" data-item-id="${item.product_id}">
+                                <div class="product-info d-flex align-items-center">
+                                    <img src="${item.basket_image}" alt="${item.product_name}" class="product-image" width="80">
+                                    <div class="product-details ms-3">
+                                        <h5 class="product-title">${item.product_name}</h5>
+                                        {% comment %} <p class="product-id">Ürün ID: ${item.product_id}</p> {% endcomment %}
+                                        <p class="product-price">${item.total_amount} ₺</p>
+                                    </div>
+                                </div>
+                                <div class="quantity-controls d-flex align-items-center">
+                                    <button class="btn btn-quantity text-white  btn-danger" onclick="changeQuantity(event, -1)">−</button>
+                                    <input type="number" class="form-control quantity-input" disabled value="${item.quantity}" min="1">
+                                    <button class="btn btn-quantity text-white  btn-success" onclick="changeQuantity(event, 1)">+</button>
+                                </div>
+                                <div class="remove-button-container m-2">
+                                    <button class="btn btn-remove" onclick="removeItem(event)"><i class="bi bi-trash"></i></button>
+                                </div>
+                            </div>
+                        `);
+                    });
+    
+                    $('#total-price').text(totalAmount.toFixed(2) + ' ₺'); // Toplam fiyatı güncelle
+                } else {
+                    $('#empty-cart-message').removeClass('d-none'); // Boş sepet mesajını göster
+                    $('#total-section').addClass('d-none');         // Toplam bölümünü gizle
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX hata: ' + error);
+            }
+        });
+    });
+    
+    // Miktarı değiştir
+    function changeQuantity(event, change) {
+        const cartItem = event.target.closest('.cart-item');
+        const itemId = cartItem.getAttribute('data-item-id');
+        const quantityInput = cartItem.querySelector('.quantity-input'); // Miktar girişini al
+        let newQuantity = parseInt(quantityInput.value) + change; // Yeni miktarı hesapla
+    
+        // Yeni miktar 1'den küçük olamaz
+        if (newQuantity < 1) {
+            newQuantity = 1; // Miktar en az 1 olmalı
+        }
+    
+        // Ürün fiyatını ve toplamı anlık güncelle
+        const pricePerItem = parseFloat(cartItem.querySelector('.product-price').textContent.replace(' ₺', '')) / parseInt(quantityInput.value); // Mevcut birim fiyatı al
+        const newTotalPrice = pricePerItem * newQuantity; // Yeni toplam fiyatı hesapla
+        cartItem.querySelector('.product-price').textContent = newTotalPrice.toFixed(2) + ' ₺'; // Ürün toplam fiyatını güncelle
+    
+        // Genel toplamı güncelle
+        let totalAmount = parseFloat(document.querySelector('.total span').textContent.replace(' ₺', '')); // Mevcut genel toplamı al
+        const difference = newTotalPrice - (pricePerItem * parseInt(quantityInput.value)); // Farkı hesapla
+        totalAmount += difference; // Yeni genel toplamı hesapla
+        document.querySelector('.total span').textContent = totalAmount.toFixed(2) + ' ₺'; // Genel toplamı güncelle
+    
+        $.ajax({
+            url: "{% url 'basket:update_quantity' %}",
+            type: "POST",
+            data: {
+                item_id: itemId,
+                action: change > 0 ? 'increase' : 'decrease',
+                quantity: newQuantity, // Yeni miktarı gönder
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            },
+            success: function(response) {
+                // Sunucudan dönen yeni miktarı güncelle
+                quantityInput.value = response.quantity; 
+                updateCartCount();
+
+            },
+            error: function(error) {
+                console.log("Hata:", error);
+            }
+        });
+        function updateCartCount() {
+            $.ajax({
+                url: "{% url 'basket:get_cart_count' %}",
+                method: "GET",
+                success: function(data) {
+                    $('#cart-count').text(data.cart_count); // Sepet sayısını güncelle
+                },
+                error: function(error) {
+                    console.log("Error:", error);
+                }
+            });
+        }
+    
+        // Sayfa yüklendiğinde sepet sayısını al
+        updateCartCount();
+    }
+    
+// Ürünü kaldır
+function removeItem(event) {
+    const cartItem = event.target.closest('.cart-item'); // Kaldırılacak öğeyi al
+    const itemId = cartItem.getAttribute('data-item-id'); // Ürün ID'sini al
+
+    // Ürünü sepetten kaldırmak için AJAX isteği
+    $.ajax({
+        url: "{% url 'basket:remove_item' %}",  // Django URL adı
+        type: "POST",
+        data: {
+            item_id: itemId,
+            csrfmiddlewaretoken: "{{ csrf_token }}"
+        },
+        success: function(response) {
+            // Başarılı olduğunda sepetten kaldır
+            cartItem.remove(); // DOM'dan öğeyi kaldır
+            updateCartTotal(); // Toplamı güncelle
+            updateCartCount(); // Sepet sayısını güncelle
+        },
+        error: function(error) {
+            console.log("Hata:", error);
+        }
+    });
+}
+
+// Sepet toplamını güncelle
+function updateCartTotal() {
+    let totalAmount = 0;
+    // Tüm sepet öğelerini dolaşarak toplam fiyatı hesapla
+    $('.cart-item').each(function() {
+        const itemPriceText = $(this).find('.product-price').text().replace(' ₺', '');
+        const itemPrice = parseFloat(itemPriceText);
+        
+        // Eğer itemPrice NaN ise, 0 olarak al
+        totalAmount += isNaN(itemPrice) ? 0 : itemPrice;
+    });
+
+    // Toplam miktarı güncelle; eğer sepet boşsa '0 ₺' olarak ayarla
+    if (totalAmount === 0) {
+        $('#total-price').text('0 ₺');
+        $('#total-section').addClass('d-none'); // Toplam bölümünü gizle
+        $('#empty-cart-message').removeClass('d-none'); // Boş sepet mesajını göster
+    } else {
+        $('#total-price').text(totalAmount.toFixed(2) + ' ₺'); // Yeni toplam fiyatı güncelle
+        $('#total-section').removeClass('d-none'); // Toplam bölümünü göster
+        $('#empty-cart-message').addClass('d-none'); // Boş sepet mesajını gizle
+    }
+}
+
+
+$(document).ready(function() {
+    // "Alışverişi Tamamla" butonuna tıklama işlemi
+    $('#checkout-button').click(function() {
+        let cartItems = [];
+
+        // Sepetteki tüm ürünleri döngüyle dolaş ve gerekli bilgileri topla
+        $('.cart-item').each(function() {
+            const itemId = $(this).data('item-id');
+            const productName = $(this).find('.product-title').text();
+            const quantity = parseInt($(this).find('.quantity-input').val());
+            const price = parseFloat($(this).find('.product-price').text().replace(' ₺', ''));
+            
+            cartItems.push({
+                itemId: itemId,
+                productName: productName,
+                quantity: quantity,
+                price: price
+            });
+        });
+
+        // Toplam fiyatı al
+        const totalAmount = $('#total-price').text();
+
+        // Verileri JSON olarak sakla
+        const cartData = {
+            items: cartItems,
+            totalAmount: totalAmount
+        };
+
+        // Sepet verilerini sessionStorage ile sakla
+        sessionStorage.setItem('cartData', JSON.stringify(cartData));
+
+        // payment.html sayfasına yönlendir
+        window.location.href = "{% url 'payment_process:payment_view' %}";  // Django URL adı
+    });
+});
+    
+    </script>
+    
+
+
+<style>
+    .header {
+        text-align: center; /* Başlığı ortala */
+    }
+    
+    #cart-container {
+        border: 1px solid #eaeaea; /* Sepet çerçevesi */
+        border-radius: 8px 8px 0px 0px; /* Kenarları yuvarlaştır */
+        padding: 20px; /* İç boşluk */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Gölge efekti */
+        background-color: #ffffff; /* Arka plan rengi */
+        max-height: 500px; /* Maksimum yükseklik */
+        overflow-y: auto; /* Dikey kaydırma çubuğu */
+    }
+    /* Daha ince ve modern bir kaydırma çubuğu görünümü için özel stiller */
+    #cart-container::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    #cart-container::-webkit-scrollbar-thumb {
+        background-color: #ccc;
+        border-radius: 4px;
+    }
+
+    #cart-container::-webkit-scrollbar-thumb:hover {
+        background-color: #aaa;
+    }
+
+    
+    .cart-item {
+        border-bottom: 1px solid #eaeaea; /* Ürünler arasında ayrım */
+        padding: 40px 0; /* Üst ve alt boşluk */
+
+    }
+    
+    .product-info {
+        flex: 1; /* Ürün bilgisine daha fazla alan tanı */
+    }
+    
+    .product-image {
+        width: 70px; /* Resim boyutu */
+        height: auto; /* Orantılı yükseklik */
+        border-radius: 8px; /* Kenar yuvarlama */
+        transition: transform 0.2s; /* Resim geçiş efekti */
+    }
+    
+    .product-image:hover {
+        transform: scale(1.05); /* Resim üzerine gelindiğinde büyüt */
+    }
+    
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+    }
+    
+    .btn-quantity {
+        background-color: #007bff; /* Buton arka plan rengi */
+        color: white; /* Buton yazı rengi */
+        min-width: 40px; /* Buton genişliği */
+        border: none; /* Kenarlıkları kaldır */
+        border-radius: 4px; /* Kenar yuvarlama */
+        transition: background-color 0.3s; /* Geçiş efekti */
+    }
+    
+    .btn-quantity:hover {
+        background-color: #0056b3; /* Hover sırasında daha koyu mavi */
+    }
+    
+    .quantity-input {
+        width: 68px; /* Girdi alanının genişliği */
+        text-align: center; /* Metni ortala */
+        margin: 0 5px; /* Yan boşluk */
+    }
+    
+    .remove-button-container {
+        display: flex; /* Dikey hizalama */
+        justify-content: center; /* Ortala */
+    }
+    
+    .btn-remove {
+        background-color: #dc3545; /* Kırmızı arka plan rengi */
+        color: white; /* Yazı rengi beyaz */
+        border: none; /* Kenarlıkları kaldır */
+        border-radius: 50%; /* Yuvarlak buton */
+        width: 40px; /* Buton genişliği */
+        height: 40px; /* Buton yüksekliği */
+        cursor: pointer; /* İmleci göster */
+        transition: background-color 0.3s, transform 0.3s; /* Geçiş efekti */
+        display: flex; /* İkonu ortalamak için */
+        align-items: center; /* Dikey ortalama */
+        justify-content: center; /* Yatay ortalama */
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Gölge efekti */
+
+    }
+    
+    .btn-remove:hover {
+        background-color: #c82333; /* Üzerine gelindiğinde daha koyu kırmızı */
+        transform: scale(1.1); /* Hover sırasında biraz büyüt */
+    }
+    
+    .total-section {
+        
+        font-weight: bold; /* Kalın metin */
+        color: #333; /* Metin rengi */
+    }
+    
+    .btn-checkout {
+        background-color: #28a745; /* Yeşil arka plan */
+        color: white; /* Yazı rengi */
+        border: none; /* Kenarlıkları kaldır */
+        border-radius: 4px; /* Kenar yuvarlama */
+        padding: 10px 20px; /* İç boşluk */
+        transition: background-color 0.3s; /* Geçiş efekti */
+    }
+    
+    .btn-checkout:hover {
+        background-color: #218838; /* Üzerine gelindiğinde daha koyu yeşil */
+    }
+    .btn-success {
+        background-color: #28a745; /* Başarılı buton rengi */
+        border-color: #28a745; /* Kenar rengi */
+    }
+
+    .btn-danger {
+        background-color: #dc3545; /* Kırmızı buton rengi */
+        border-color: #dc3545; /* Kenar rengi */
+    }
+    /* Responsive ayarlar */
+    @media (max-width: 768px) {
+        .cart-item {
+            flex-direction: column; /* Dikey hizalama */
+        }
+        
+        .total-section {
+            flex-direction: column; /* Dikey hizalama */
+            align-items: center; /* Ortala */
+        }
+        
+        .total {
+            margin-bottom: 10px; /* Alt boşluk */
+            text-align: center; /* Yazıyı ortala */
+            
+        }
+    }
+    .product-btn {
+        background-color: #6F4C3E;
+        color: white;
+        border-radius: 20px;
+        padding: 12px 25px; /* Düğme için biraz daha fazla boşluk */
+        font-size: 16px;
+        font-weight: bold;
+        border: none; /* Kenarlık kaldırıldı */
+        transition: background-color 0.3s, color 0.3s, transform 0.3s;
+      }
+
+      .product-btn:hover {
+        background-color: white;
+        color: #6F4C3E;
+        border: 1px solid #6F4C3E; /* Kenarlık ekleme */
+        cursor: pointer;
+        transform: scale(1.1);
+      }
+</style>
+
+
+
+{% endblock %}
+{% include 'base/footer.html' %}

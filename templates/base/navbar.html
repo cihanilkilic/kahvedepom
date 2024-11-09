@@ -1,0 +1,270 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/layout/main_navbar_offcanvas.css' %}">
+<link rel="stylesheet" href="{% static 'css/layout/carousel.css' %}">
+<link rel="stylesheet" href="{% static 'css/layout/product_card.css' %}">
+<link rel="stylesheet" href="{% static 'css/layout/footer.css' %}">
+<!-- Navbar -->
+<style>
+.dropdown-toggle::after {
+color:#6F4C3E; /* İkonun rengini buradan değiştirebilirsin */
+}
+</style>
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top py-3" >
+    <div class="container justify-content-center">
+        <a class="navbar-brand fw-bold text-coffee" style="color: #6F4C3E" href="{% url 'main_home:index'%}">☕ Kahve Depom</a>
+        <div class="d-flex align-items-center">
+            <div class="btn-group">
+                <button class="btn btn-sm dropdown-toggle"  type="button" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">
+                    <i class="bi bi-people text-coffee" style="font-size: 1.5rem;"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-lg-start border border-1" style="background-color: #f8f9fa;border: none;">
+                    {% if request.user.is_authenticated %}
+                    <li><a class="dropdown-item text-coffee" href="{% url 'user:user_logout' %}">Çıkış Yap <i class="bi bi-box-arrow-right text-coffee" style="font-size: 1.0rem;"></i></a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-coffee" href="{% url "user:profil" %}">Hesabım <i class="bi bi-person-fill-gear text-coffee"  style="font-size: 1.0rem;"></i></a></li>
+                    <li><a class="dropdown-item text-coffee" href="{% url "user:orders" %}">Tüm Siparişlerim <i class="bi bi-shop text-coffee"  style="font-size: 1.0rem;"></i></a></li>
+                    {% else %}
+                    <li><a class="dropdown-item text-coffee" href="{% url 'user:login' %}">Giriş Yap <i class="bi bi-person text-coffee" style="font-size: 1.0rem;"></i></a></li>
+                    <li><a class="dropdown-item text-coffee" href="{% url 'user:register' %}">Kayıt Ol <i class="bi bi-person-add text-coffee" style="font-size: 1.0rem;"></i></a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <a class="btn btn-link p-0 me-3" href="{% url 'basket:basket' %}" aria-label="Sepetim">
+                <div class="icon-container" style="display: inline-block; position: relative;">
+                    <i class="bi bi-cart2 text-coffee" style="font-size: 1.5rem;"></i>
+                    <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        0
+                    </span>
+                </div>
+            </a>
+            
+            <style>
+                .icon-container {
+                    background-color: #f8f9fa; /* Arka plan rengi */
+                    border-radius: 60%; /* Daire biçimi */
+                    /* padding: 1px;  İç boşluk */
+                    transition: transform 0.2s; /* Geçiş efekti */
+                }
+            
+                .icon-container:hover {
+                    transform: scale(1.1); /* Hover efekti */
+                }
+                
+                #cart-count {
+                    font-size: 0.70rem; /* Sayı boyutu */
+                }
+                /* Öneri kutusunun görünümünü iyileştirir */
+                /* Öneri kutusunun görünümünü iyileştirir */
+                #suggestions {
+                    max-height: 300px;
+                    overflow-y: auto;
+                    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+                    border-radius: 4px;
+                }
+                
+                /* Daha ince ve modern bir kaydırma çubuğu görünümü için özel stiller */
+                #suggestions::-webkit-scrollbar {
+                    width: 8px;
+                }
+            
+                #suggestions::-webkit-scrollbar-thumb {
+                    background-color: #ccc;
+                    border-radius: 4px;
+                }
+            
+                #suggestions::-webkit-scrollbar-thumb:hover {
+                    background-color: #aaa;
+                }
+
+
+
+
+
+
+
+
+
+                #suggestions .dropdown-item {
+                    display: flex;
+                    align-items: center;
+                    padding: 10px;
+                    font-size: 14px;
+                    color: #333;
+                    cursor: pointer;
+                }
+                
+                #suggestions .dropdown-item img {
+                    width: 50px;
+                    height: 50px;
+                    object-fit: cover;
+                    margin-right: 10px;
+                    border-radius: 4px;
+                }
+                
+                #suggestions .dropdown-item:hover {
+                    background-color: #f1f1f1;
+                    color: #333;
+                }
+                
+                #suggestions .product-info {
+                    display: flex;
+                    flex-direction: column;
+                }
+                #suggestions .product-info .price {
+                    color: #777;
+                    font-size: 12px;
+                }
+                /* Düğmeyi sağ alt köşeye sabitlemek için stil */
+                #backToTopBtn {
+                    display: none; /* İlk başta gizli */
+                    position: fixed;
+                    bottom: 20px;
+                    right: 20px;
+                    z-index: 99;
+                }
+            </style>
+            
+        </div>
+        <div class="input-group shadow-sm mx-3" style="position: relative;">
+            <input type="search" class="form-control border-0 rounded-start" autocomplete="off" list="datalistOptions" id="search-box" placeholder="Kahve,şurup,püre..." aria-label="Search" aria-describedby="search-icon">
+            <div id="suggestions" class="dropdown-menu" style="display: none; position: absolute; width: 100%; top: 100%; left: 0; z-index: 1000;">
+                <!-- Dinamik arama sonuçları buraya eklenecek -->
+            </div>
+            <span class="input-group-text bg-white border-0" id="search-icon">
+               <!-- <i class="bi bi-search text-muted" style="font-size: 1.2rem;"></i>-->
+            </span>
+            <button class="btn btn-coffee" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu" aria-label="Kategoriler">
+                <i class="bi bi-distribute-vertical"></i><!--Kategoriler-->
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- backToTopBtn -->
+<button id="backToTopBtn" class="btn btn-light boder boder-1">
+    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-chevron-double-up" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M7.646 2.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 3.707 2.354 9.354a.5.5 0 1 1-.708-.708z"/>
+        <path fill-rule="evenodd" d="M7.646 6.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 7.707l-5.646 5.647a.5.5 0 0 1-.708-.708z"/>
+      </svg>
+</button>
+<!-- backToTopBtn -->
+
+
+<!-- Navbar -->
+<script src="{% static 'js/product/cart_count.js' %}"></script> 
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function updateCartCount() {
+        $.ajax({
+            url: "{% url 'basket:get_cart_count' %}",
+            method: "GET",
+            success: function(data) {
+                $('#cart-count').text(data.cart_count); // Sepet sayısını güncelle
+            },
+            error: function(error) {
+                console.log("Error:", error);
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        // Sayfa yüklendiğinde sepet sayısını al
+        updateCartCount();
+
+        // Sepete ürün eklendiğinde bu fonksiyonu çağırın
+        $('.add-to-cart').on('click', function() {
+            // Sepete ürün ekleme işlemleri burada yapılmalı.
+            // Ürün sepete eklendiğinde sepet sayısını güncelle
+            updateCartCount();
+        });
+    });
+    $(document).ready(function() {
+        $('#search-box').on('input', function() {
+            var query = $(this).val();
+            if (query.length > 0) {
+                $.ajax({
+                    url: "{% url 'main_home:search_products' %}",  // Django'daki arama görünümünün URL'i
+                    method: 'GET',
+                    data: {
+                        'q': query
+                    },
+                    success: function(response) {
+                        var results = response.products;
+                        var suggestions = ''; 
+                        if (results.length > 0) {
+                            results.forEach(function(product) {
+                                suggestions += `
+                                    <a class="dropdown-item">
+                                        <img src="${product.image_url}" alt="${product.name}">
+                                        <div class="product-info">
+                                            <span class="link-info link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover name" data-item-id="${product.id}"><i class="bi bi-arrow-right-short"></i>${product.name}&nbsp;${product.price}&nbsp;₺</span>
+                                            <span class="link-warning link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover category" data-item-id="${product.category}"><i class="bi bi-distribute-vertical"></i>&nbsp;${product.category}</span>
+                                        </div>
+                                    </a>`;
+                            });
+                        } else {
+                            suggestions = '<a class="dropdown-item disabled">Sonuç bulunamadı</a>';
+                        }
+                        $('#suggestions').html(suggestions).show();
+                    },
+                    error: function() {
+                        $('#suggestions').html('<a class="dropdown-item disabled">Bir hata oluştu</a>').show();
+                    }
+                });
+            } else {
+                $('#suggestions').hide();
+            }
+        });
+    
+        // Tıklayınca arama kutusuna ekleme yapma
+        $(document).on('click', '#suggestions .dropdown-item', function() {
+            $('#search-box').val($(this).find('.name').text());
+            $('#suggestions').hide();
+        });
+    
+        // Category elementine tıklanma işlevi - belirli bir URL'ye yönlendirme
+        $(document).on('click', '.category', function(e) {
+            e.stopPropagation();  // Diğer tıklama olaylarını engelle
+            var categoryName = $(this).text().trim();  // Kategori adını al
+    
+            // Django URL'sinde placeholder kullanarak URL'yi oluştur
+            var categoryUrl = "{% url 'product:product' '__category_name__' %}".replace('__category_name__', encodeURIComponent(categoryName));
+            
+            window.location.href = categoryUrl;  // Sayfayı yönlendir
+        });
+    
+        // Name elementine tıklanma işlevi - belirli bir URL'ye yönlendirme
+        $(document).on('click', '.name', function(e) {
+            e.stopPropagation();  // Diğer tıklama olaylarını engelle
+            var productId = $(this).data('item-id');  // Ürün ID'sini al
+            var productDetailUrl = "{% url 'product:product_detail' '0' %}".replace('0', productId);  // URL'yi oluştur
+            window.location.href = productDetailUrl;  // Sayfayı yönlendir
+        });
+    
+        // Sayfanın herhangi bir yerine tıklayınca öneri kutusunu gizleme
+        $(document).click(function(e) {
+            if (!$(e.target).closest('.search-container').length) {
+                $('#suggestions').hide();
+            }
+        });
+    });
+    
+</script>
+<script>
+    // Sayfa kaydırıldığında düğmenin görünürlüğünü kontrol et
+    window.onscroll = function() { scrollFunction(); };
+
+    function scrollFunction() {
+        if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+            document.getElementById("backToTopBtn").style.display = "block";
+        } else {
+            document.getElementById("backToTopBtn").style.display = "none";
+        }
+    }
+
+    // Düğmeye tıklandığında sayfayı en üste kaydır
+    document.getElementById("backToTopBtn").onclick = function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+</script>

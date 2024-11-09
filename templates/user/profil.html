@@ -1,0 +1,349 @@
+{% extends "base/layout.html" %}
+{% block content %}
+{% include 'base/offcanvas_menu.html' %}
+<div class="container">
+    <div class="header d-flex align-items-center mb-4 mt-5">
+        <h2 class="me-3">Hesap Ayarları</h2>
+        <hr class="flex-grow-1" style="margin: 0;">
+    </div>
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} text-center border border-1 bg-secondary text-white" role="alert" id="message-{{ forloop.counter }}">
+            {{ message }}
+        </div>
+        <script>
+            setTimeout(function() {
+                document.getElementById('message-{{ forloop.counter }}').style.display = 'none';
+            }, 5000); // 5 saniye sonra kaybolur
+        </script>
+    {% endfor %}
+{% endif %}
+
+    <div class="row apple-style mt-5">
+        <div class="col-md-4 mb-3 ">
+        <div class="list-group" id="list-tab" role="tablist">
+            <a class="list-group-item list-group-item-action active fullName" id="list-home-list" data-bs-toggle="list" href="#list-home" role="tab" aria-controls="list-home">{{ full_name }}</a>
+            <a class="list-group-item list-group-item-action" id="list-profile-list" data-bs-toggle="list" href="#list-profile" role="tab" aria-controls="list-profile">Kullanıcı Bilgilerim</a>
+            <a class="list-group-item list-group-item-action" id="list-messages-list" data-bs-toggle="list" href="#list-messages" role="tab" aria-controls="list-messages">Şifre Güncelleme</a>
+            <a class="list-group-item list-group-item-action" id="list-settings-list" data-bs-toggle="list" href="#list-settings" role="tab" aria-controls="list-settings">Adres İşlemleri</a>
+        </div>
+        </div>
+        <div class="col-md-8 mb-5">
+        <div class="tab-content" id="nav-tabContent">
+            <div class="tab-pane fade show active text-center" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
+                <div class="header d-flex align-items-center mb-4 mt-5">
+                    <h2 class="me-3 fullName"> {{ full_name }}</h2>
+                    <hr class="flex-grow-1" style="margin: 0;">
+                </div>
+            </div>
+            <div class="tab-pane fade" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">
+                {% include 'user/membership_information.html' %}
+            </div>
+            <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">
+                {% include 'user/update_password.html' %}
+            </div>
+            <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">
+                <div class="header d-flex align-items-center mb-4 mt-5">
+                    <button  type="button" class="btn btn-info me-3 text-white" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                            Yeni Adres Ekle
+                    </button>
+                    <hr class="flex-grow-1" style="margin: 0;">
+                </div>
+                {% include 'user/update_address.html' %}
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            url: "{% url 'user:profil' %}",  // Profil verisini çekmek için URL
+            type: "GET",
+            dataType: "json",
+            success: function (data) {
+                $('.fullName').text(data.full_name);
+                $('.addressList').empty();
+                if (data.addresses.length > 0) {
+                    $('.noAddress').hide();
+                    $.each(data.addresses, function (index, address) {
+                        var addressCard = `
+                            <div class="col-sm-6 mb-4" data-id="${address.id}">
+                                <div class="card" style="width: 18rem;">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${address.address_title || 'Adres Başlığı'}</h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">${data.full_name}</h6>
+                                        <p class="card-text">
+                                            Telefon: ${address.phone}<br>
+                                            İl: ${address.city}<br>İlçe: ${address.district}<br> Mahalle: ${address.mahalle}<br>
+                                            Adres: ${address.address}<br>
+                                        </p>
+                                        <button type="button" class="deleteAddressButton link-danger" data-id="${address.id}" style="background: none; border: none; color: red; cursor: pointer;">
+                                            Adresi Sil
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        $('.addressList').append(addressCard);
+                    });
+                } else {
+                    $('.noAddress').show();
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error("Profil verisi alınamadı:", error);
+            }
+        });
+
+        // Adresi Sil butonuna tıklama işlemi
+        $(document).on('click', '.deleteAddressButton', function () {
+            var addressId = $(this).data('id');
+            var cardDiv = $(this).closest('.col-sm-6');  // Silinecek kartı belirle
+
+            $.ajax({
+                url: `/user/delete_address/${addressId}/`,
+                type: "POST",
+                headers: { "X-CSRFToken": "{{ csrf_token }}" },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        cardDiv.remove();  // Başarıyla silinirse kartı kaldır
+                        displayAlertPopup('Adres Başarıyla Silindi'); // Popup mesajı
+                        if ($('.addressList .col-sm-6').length === 0) {
+                            $('.noAddress').show();
+                        }
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Adres silinirken hata oluştu:", error);
+                }
+            });
+        });
+        function displayAlertPopup(message) {
+            // Özel bir uyarı popup'ı oluştur
+            var popup = $('<div class="custom-popup bg-danger text-coffee text-uppercase">' + message + '<i class="bi bi-check2-circle"></i></div>');
+            
+            // Popup'ı body'e ekle
+            $('body').append(popup);
+            
+            // Popup'ı göster
+            popup.fadeIn();
+            
+            // 2 saniye sonra popup'ı gizle
+            setTimeout(function() {
+                popup.fadeOut(function() {
+                    // Fade out'dan sonra popup'ı DOM'dan kaldır
+                    $(this).remove();
+                });
+            }, 2000);
+        }
+    
+    });
+    
+    $(document).ready(function () {
+        $('.updatepassword').on('click', function () {
+            var currentPassword = $('#inputPassword1').val();
+            var newPassword = $('#inputPassword2').val();
+            var confirmPassword = $('#inputPassword3').val();
+    
+            // Yeni şifre ve tekrar şifre eşleşiyor mu kontrol et
+            if (newPassword !== confirmPassword) {
+                //alert("Yeni şifreler eşleşmiyor!");
+                displayAlertPopup('Yeni şifreler eşleşmiyor!');
+                return;
+            }
+    
+            $.ajax({
+                url: "{% url 'user:change_password' %}", // Django URL'sini kullanın
+                type: "POST",
+                data: {
+                    'old_password': currentPassword,
+                    'new_password1': newPassword,
+                    'new_password2': confirmPassword,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}' // CSRF token
+                },
+                success: function (response) {
+                    if (response.status === 'success') {
+                       // alert(response.message);
+                displayAlertPopup(response.message);
+                        
+                        // Formu temizleyebilir veya yönlendirme yapabilirsiniz
+                        $('#inputPassword1').val('');
+                        $('#inputPassword2').val('');
+                        $('#inputPassword3').val('');
+                    } else {
+                        // Hata mesajlarını göster
+                       let errorMessages = response.message.join('\n'); // Hata mesajlarını birleştir
+                      //  alert("Hata:\n" + errorMessages);
+
+                displayAlertPopup("Hata:\n" + errorMessages);
+
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Şifre değiştirilirken hata oluştu:", error);
+                    alert("Şifre değiştirilirken bir hata oluştu. Lütfen tekrar deneyin.");
+                }
+            });
+        });
+
+
+
+    });
+    function displayAlertPopup(message) {
+        // Özel bir uyarı popup'ı oluştur
+        var popup = $('<div class="custom-popup bg-danger text-coffee text-uppercase">' + message + '</div>');
+        
+        // Popup'ı body'e ekle
+        $('body').append(popup);
+        
+        // Popup'ı göster
+        popup.fadeIn();
+        
+        // 2 saniye sonra popup'ı gizle
+        setTimeout(function() {
+            popup.fadeOut(function() {
+                // Fade out'dan sonra popup'ı DOM'dan kaldır
+                $(this).remove();
+            });
+        }, 2000);
+    }
+    $(document).ready(function () {
+        $('.updatenamelastname').on('click', function () {
+            // Form verilerini al
+            var ad = $('#Ad').val();
+            var soyad = $('#Soyad').val();
+            var email = $('#Email').val();
+    
+            // Form doğrulama
+            if (!ad || !soyad || !email) {
+              //  alert("Lütfen tüm alanları doldurun.");
+                displayAlertPopup("Lütfen tüm alanları doldurun.!");
+                
+                return;
+            }
+    
+            // AJAX isteği gönder
+            $.ajax({
+                url: "{% url 'user:update_name_email' %}", // Django URL'sini kullanın
+                type: "POST",
+                data: {
+                    'first_name': ad,
+                    'last_name': soyad,
+                    'email': email,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}' // CSRF token
+                },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        //alert("Bilgileriniz başarıyla güncellendi!");
+                        displayAlertPopup("Bilgileriniz başarıyla güncellendi!");
+
+                        $('.fullName').text(ad + " " + soyad); // Güncellenen adı ve soyadı göster
+                        // Formu temizle
+                        $('#Ad').val('');
+                        $('#Soyad').val('');
+                        $('#Email').val('');
+                    } else {
+                        alert("Güncelleme sırasında hata oluştu: " + response.message);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("Güncelleme işlemi sırasında bir hata oluştu:", error);
+                    alert("Bir hata oluştu, lütfen tekrar deneyin.");
+                }
+            });
+        });
+    });
+    
+    
+</script>
+    <style>
+    .custom-popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #28a745; /* Başarı yeşili */
+        color: #fff;
+        padding: 20px;
+        border: none;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        max-width: 300px;
+        text-align: center;
+        font-size: 16px;
+        font-family: Arial, sans-serif;
+        z-index: 1000; /* Popup'ın üstte görünmesi için */
+        display: none; /* Başlangıçta gizle */
+    }
+    .apple-style .list-group-item {
+    background-color: #f0f0f5;
+    color: #333;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 15px 20px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
+    text-align: center;
+    }
+
+    .apple-style .list-group-item.active {
+    background-color: #007aff;
+    color: #ffffff;
+    border: 1px solid #007aff;
+    font-weight: 600;
+    box-shadow: 0 8px 16px rgba(0, 122, 255, 0.3);
+    transform: scale(1.05);
+    }
+
+    .apple-style .list-group-item:hover {
+    background-color: #e5e5ea;
+    color: #007aff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .apple-style .tab-content {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e5;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    }
+
+    .apple-style .tab-pane {
+    font-size: 16px;
+    color: #3a3a3c;
+    font-weight: 400;
+    line-height: 1.6;
+    }
+
+    /* Duyarlı Tasarım */
+    @media (max-width: 768px) {
+    .apple-style .row {
+        flex-direction: column;
+    }
+    
+    .apple-style .list-group-item {
+        font-size: 14px;
+        padding: 12px 16px;
+        margin-bottom: 8px;
+    }
+    
+    .apple-style .tab-content {
+        padding: 20px;
+        border-radius: 10px;
+    }
+    
+    .apple-style .tab-pane {
+        font-size: 15px;
+    }
+    }
+
+    </style>  
+{% endblock %}

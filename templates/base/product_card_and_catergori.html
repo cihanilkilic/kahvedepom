@@ -1,0 +1,45 @@
+
+{% extends "base/layout.html" %}
+{% block content %}
+{% include 'base/offcanvas_menu.html' %}
+
+<!-- product_card_and_catergori -->
+<div class="container my-5">
+  <div class="d-flex align-items-center mb-4">
+      <h4 class="me-3" style="color: #6F4C3E; ">{{ category.name }}</h4>
+      <hr class="flex-grow-1" style="margin: 0;">
+  </div>
+  <div class="row">
+      {% for product in products %}
+          <div class="col-12 col-sm-6 col-md-4 mb-4">
+              <div class="card border-0 shadow-sm rounded-3 product-card">
+                  {% if product.images.count > 0 %}
+                  <img src="{{ product.images.first.image.url }}" class="card-img-top" alt="Cappuccino" style="height: 250px; width: 100%; object-fit: contain;">
+                  {% else %}
+                      <p>Resim mevcut değil.</p>
+                  {% endif %}
+                  <div class="card-body text-center">
+                      <h5 class="card-title fw-bold text-dark">{{ product.name }}</h5>
+                      {% comment %} <p class="card-text text-muted">{{ product.description }}</p> {% endcomment %}
+                      <p class="card-text fw-bold text-danger">{{ product.price|floatformat:2 }} ₺</p> <!-- Fiyat bilgisi eklendi -->
+
+
+                      <a href="{% url "product:product_detail" product.pk %}" class="btn product-btn">{{product.pk}}Ürünü İncele</a>
+                      {% comment %} <button class="btn product-btn">Ürünü İncele</button> {% endcomment %}
+                  </div>
+              </div>
+          </div>
+      {% empty %}
+            <div class="bg-light text-coffee text-center boder border-0 mb-5" role="alert">
+             <h1> Bu kategoriye ait <br> <b>ürün bulunmamaktadır.</1>
+            </div>
+            
+      {% endfor %}
+  </div>
+</div>
+
+
+
+<!-- product_card_and_catergori -->
+{% endblock %}
+{% include 'base/footer.html' %}

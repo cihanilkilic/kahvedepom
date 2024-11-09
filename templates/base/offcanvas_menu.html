@@ -1,0 +1,131 @@
+<!-- Offcanvas yapısı -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title fw-bold text-coffee" id="offcanvasMenuLabel">☕ Kahve Depom - Kategori</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Kapat"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="accordion" id="offcanvasAccordion">
+            <ul class="list-unstyled coffee-list" id="categoryList">
+                <!-- Kategoriler buraya AJAX ile yüklenecek -->
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Offcanvas açıldığında kategorileri yükle
+        $('#offcanvasMenu').on('show.bs.offcanvas', function () {
+            $.ajax({
+                url: "{% url 'main_home:index' %}",  // URL'in Django'daki ismine göre güncelleyin
+                type: "GET",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"  // AJAX isteği olarak belirtiyoruz
+                },
+                success: function(response) {
+                    const categories = response.categories;
+                    let categoryHtml = '';
+    
+                    // Kategorileri liste halinde oluştur
+                    categories.forEach(function(category) {
+                        // Dinamik olarak URL oluştur
+                        const categoryUrl = "{% url 'product:product' 0 %}".replace('0', category.name);
+                        categoryHtml += `<li class="list-group-item text-center">
+                                            <a href="${categoryUrl}" class="link-coffee-hover">${category.name}</a>
+                                         </li>`;
+                    });
+    
+                    // Kategori listesini güncelle
+                    $('#categoryList').html(categoryHtml);
+                },
+                error: function(xhr, status, error) {
+                    console.error("Kategoriler yüklenemedi:", error);
+                }
+            });
+        });
+    });
+    
+</script>
+
+<!-- Offcanvas Menü -->
+
+
+
+{% comment %} <!-- Offcanvas Menü -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title fw-bold text-coffee" id="offcanvasMenuLabel">☕ Kahve Depom - Kategorilerimiz</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Kapat"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="accordion" id="offcanvasAccordion">
+            <ul class="list-unstyled coffee-list">
+                {% for category in categories %}
+                <li class="list-group-item text-center"><a href="{% url "product:product" category.name %}" class="link-coffee-hover">{{category.name}}</a></li>
+                    {% endfor %}
+                  </ul>
+        {% comment %} {% for category in categories %}
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+                        {{ category.name }}
+                    </button>
+                </h2>
+                <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse" aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#offcanvasAccordion">
+                    <div class="accordion-body">
+                        <ul class="list-unstyled coffee-list">
+                            <!-- Kategoriye ait ürünleri listele -->
+                            {% for product in category.product_set.all %}
+                                <li><a href="{% url "product:product" category.name %}" class="link-coffee-hover">{{ product.name }}</a></li>
+                            <!--<li><a href="" class="link-coffee-hover">{{ product.name }} - {{ product.price }} TL</a></li>-->
+                            {% empty %}
+                                <li class="text-coffee">Bu kategoriye ait ürün bulunmamaktadır.</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingThree">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                        Yeni Gelenler
+                    </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#offcanvasAccordion">
+                    <div class="accordion-body">
+                        <ul class="list-unstyled  coffee-list">
+                            <li><a href="" class="link-coffee-hover">Kahve Çeşidi A</a></li>
+                            <li><a href="" class="link-coffee-hover">Kahve Çeşidi B</a></li>
+                            <li><a href="" class="link-coffee-hover">Kahve Çeşidi C</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="headingFour">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                        Fırsatlar
+                    </button>
+                </h2>
+                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#offcanvasAccordion">
+                    <div class="accordion-body">
+                        <ul class="list-unstyled  coffee-list">
+                            <li><a href="" class="link-coffee-hover">Fırsat 1</a></li>
+                            <li><a href="" class="link-coffee-hover">Fırsat 2</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+
+            
+        </div>
+    </div>
+</div>
+<!-- Offcanvas Menü --> {% endcomment %}

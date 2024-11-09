@@ -1,0 +1,59 @@
+<!-- product card -->
+<div class="container my-5">
+    <div id="category-container"></div> <!-- Dinamik kategoriler burada yüklenecek -->
+</div>
+
+<!-- URL'i veri-attribüsü ile ekledik -->
+<div id="ajax-url" data-url="{% url 'main_home:index' %}"></div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        const ajaxUrl = $('#ajax-url').data('url');
+
+        $.ajax({
+            url: ajaxUrl,
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                const categories = data.categories;
+
+                categories.forEach(function(category, index) {
+                    if (category.products.length === 0) return;
+
+                    let categoryHTML = `
+                        <div class="d-flex align-items-center mb-4">
+                            <h4 class="me-3" style="color: #6F4C3E;">${category.name}</h4>
+                            <hr class="flex-grow-1" style="margin: 0;">
+                        </div>
+                        <div class="overflow-auto d-flex flex-nowrap" id="category-${index}">
+                    `;
+
+                    category.products.forEach(function(product) {
+                        let imageUrl = product.image_url || 'https://via.placeholder.com/250';
+
+                        categoryHTML += `
+                            <div class="card me-3 border-0 shadow-sm rounded-3 product-card" style="flex: 0 0 auto;">
+                                <div class="image-container" style="width: 250px; height: 250px;">
+                                    <img src="${imageUrl}" class="card-img-top" alt="${product.name}">
+                                </div>
+                                <div class="card-body text-center">
+                                    <span class="card-title fw-bold text-dark" style="font-size: 1.0rem;">${product.name}</span>
+                                    <p class="card-text text-muted">${product.price}₺</p>
+                                    <a href="/product/product_detail/${product.id}" class="btn product-btn">Ürünü İncele</a>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    categoryHTML += '</div>';
+                    $('#category-container').append(categoryHTML);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX request failed: " + status + " - " + error);
+            }
+        });
+    });
+</script>
